@@ -1,5 +1,3 @@
-import { FormEvent, useState } from "react";
-import { Loader, Placeholder } from "@aws-amplify/ui-react";
 import "./App.css";
 import { Amplify } from "aws-amplify";
 import outputs from "../amplify_outputs.json";
