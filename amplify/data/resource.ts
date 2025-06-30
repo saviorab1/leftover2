@@ -1,12 +1,33 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
 const schema = a.schema({
-  Todo: a
-    .model({
-      content: a.string(),
-      done: a.boolean().default(false),
+  BedrockResponse: a.customType({
+    body: a.string(),
+    error: a.string(),
+  }),
+
+  askBedrock: a
+    .query()
+    .arguments({ 
+      ingredients: a.string().array(),
+      useFallback: a.boolean()
     })
-    .authorization((allow) => [allow.owner()]),
+    .returns(a.ref("BedrockResponse"))
+    .authorization((allow) => [allow.authenticated()])
+    .handler(
+      a.handler.custom({ entry: "./bedrock.js", dataSource: "bedrockDS" })
+    ),
+    
+  askBedrockFallback: a
+    .query()
+    .arguments({ 
+      ingredients: a.string().array() 
+    })
+    .returns(a.ref("BedrockResponse"))
+    .authorization((allow) => [allow.authenticated()])
+    .handler(
+      a.handler.custom({ entry: "./bedrock.js", dataSource: "bedrockFallbackDS" })
+    ),
 });
 
 export type Schema = ClientSchema<typeof schema>;

@@ -4,6 +4,7 @@
   font-weight: 400;
 
   color: rgba(255, 255, 255, 0.87);
+  background-color: #fcffe3;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,7 +14,14 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
+}
 
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #fcffe3;
 }
 
 .card {
@@ -21,7 +29,7 @@
 }
 
 .read-the-docs {
-  color: #888;
+  color: #8DCB85;
 }
 
 .box:nth-child(3n + 1) {
