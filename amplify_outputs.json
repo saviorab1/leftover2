@@ -1,9 +1,9 @@
 {
   "auth": {
-    "user_pool_id": "ap-southeast-1_Y25iC05do",
+    "user_pool_id": "ap-southeast-1_k5OShCb7M",
     "aws_region": "ap-southeast-1",
-    "user_pool_client_id": "1ig0s6v7bjlqp9fhvd4an3gdbo",
-    "identity_pool_id": "ap-southeast-1:a1c8da86-e8fa-4573-af7a-a21ead9b5a59",
+    "user_pool_client_id": "68o3m1s2igh4kkb9pi84ld8ijc",
+    "identity_pool_id": "ap-southeast-1:3891b679-6161-44d2-ba18-79b6db3eb0f7",
     "mfa_methods": [],
     "standard_required_attributes": [
       "email"
@@ -26,9 +26,9 @@
     "unauthenticated_identities_enabled": true
   },
   "data": {
-    "url": "https://ulyguorq7zg5rdgqrit5d3cdny.appsync-api.ap-southeast-1.amazonaws.com/graphql",
+    "url": "https://pydb7q47x5frnj6gjsqogjfu3m.appsync-api.ap-southeast-1.amazonaws.com/graphql",
     "aws_region": "ap-southeast-1",
-    "api_key": "da2-fazdm7wo75fdze3faw2cdf5iim",
+    "api_key": "da2-4w3ra2hqorcprajhv4lkkbd33q",
     "default_authorization_type": "API_KEY",
     "authorization_types": [
       "AMAZON_COGNITO_USER_POOLS",
@@ -36,84 +36,48 @@
     ],
     "model_introspection": {
       "version": 1,
-      "models": {
-        "Todo": {
-          "name": "Todo",
+      "models": {},
+      "enums": {},
+      "nonModels": {
+        "BedrockResponse": {
+          "name": "BedrockResponse",
           "fields": {
-            "id": {
-              "name": "id",
-              "isArray": false,
-              "type": "ID",
-              "isRequired": true,
-              "attributes": []
-            },
-            "content": {
-              "name": "content",
+            "body": {
+              "name": "body",
               "isArray": false,
               "type": "String",
               "isRequired": false,
               "attributes": []
             },
-            "done": {
-              "name": "done",
+            "error": {
+              "name": "error",
               "isArray": false,
-              "type": "Boolean",
+              "type": "String",
               "isRequired": false,
               "attributes": []
-            },
-            "createdAt": {
-              "name": "createdAt",
-              "isArray": false,
-              "type": "AWSDateTime",
-              "isRequired": false,
-              "attributes": [],
-              "isReadOnly": true
-            },
-            "updatedAt": {
-              "name": "updatedAt",
-              "isArray": false,
-              "type": "AWSDateTime",
-              "isRequired": false,
-              "attributes": [],
-              "isReadOnly": true
             }
-          },
-          "syncable": true,
-          "pluralName": "Todos",
-          "attributes": [
-            {
-              "type": "model",
-              "properties": {}
-            },
-            {
-              "type": "auth",
-              "properties": {
-                "rules": [
-                  {
-                    "provider": "userPools",
-                    "ownerField": "owner",
-                    "allow": "owner",
-                    "identityClaim": "cognito:username",
-                    "operations": [
-                      "create",
-                      "update",
-                      "delete",
-                      "read"
-                    ]
-                  }
-                ]
-              }
-            }
-          ],
-          "primaryKeyInfo": {
-            "isCustomPrimaryKey": false,
-            "primaryKeyFieldName": "id",
-            "sortKeyFieldNames": []
           }
         }
       },
-      "enums": {},
-      "nonModels": {}
+      "queries": {
+        "askBedrock": {
+          "name": "askBedrock",
+          "isArray": false,
+          "type": {
+            "nonModel": "BedrockResponse"
+          },
+          "isRequired": false,
+          "arguments": {
+            "ingredients": {
+              "name": "ingredients",
+              "isArray": true,
+              "type": "String",
+              "isRequired": false,
+              "isArrayNullable": true
+            }
+          }
+        }
+      }
     }
   },
   "version": "1.4"

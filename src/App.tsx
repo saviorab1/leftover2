@@ -23,30 +23,41 @@ function App() {
   const [inputValue, setInputValue] = useState("");
   const [animateIntro, setAnimateIntro] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [usingFallback, setUsingFallback] = useState(false);
 
   useEffect(() => {
     // Trigger animation after component mounts
     setAnimateIntro(true);
   }, []);
 
-  const callBedrockAPI = async (ingredients: string[], useFallback = false) => {
+  const callBedrockAPI = async (ingredients: string[]) => {
     // Create a promise that will reject after 30 seconds
     const timeout = new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error('Request timed out')), 30000);
     });
     
     try {
+      console.log('Calling Bedrock API with cross-region inference, ingredients:', ingredients);
       const response = await Promise.race([
-        useFallback 
-          ? amplifyClient.queries.askBedrockFallback({ ingredients })
-          : amplifyClient.queries.askBedrock({ ingredients, useFallback: false }),
+        amplifyClient.queries.askBedrock({ ingredients }),
         timeout
       ]);
+      console.log('Received response:', response);
       
       // If we get here, API request completed before timeout
       if (!response.data) {
         throw new Error("No data returned from the API");
+      }
+      
+      // Check if there's an error in the response
+      if (response.data.error) {
+        console.error('Bedrock API returned error:', response.data.error);
+        console.error('Full response:', response);
+        throw new Error(response.data.error);
+      }
+      
+      // Check if body is empty or null
+      if (!response.data.body) {
+        throw new Error("Empty response body from the API");
       }
       
       return response.data.body;
@@ -63,7 +74,6 @@ function App() {
     setLoading(true);
     setResult("");
     setError(null);
-    setUsingFallback(false);
 
     try {
       const ingredientsInput = inputValue.trim();
@@ -72,34 +82,16 @@ function App() {
         .map(ingredient => ingredient.trim())
         .filter(ingredient => ingredient.length > 0);
       
-      try {
-        // First try the primary region (ap-southeast-1)
-        const resultText = await callBedrockAPI(ingredientsArray, false);
-        setResult(resultText || "No recipe content returned");
-      } catch (primaryError) {
-        console.warn("Primary region failed, trying fallback:", primaryError);
-        setUsingFallback(true);
-        
-        try {
-          // If primary region fails, try the fallback region (ap-northeast-1)
-          const fallbackResult = await callBedrockAPI(ingredientsArray, true);
-          setResult(fallbackResult || "No recipe content returned");
-        } catch (fallbackError) {
-          // Both regions failed
-          console.error("Both regions failed:", fallbackError);
-          if (fallbackError instanceof Error) {
-            setError(`Service unavailable: ${fallbackError.message}`);
-          } else {
-            setError("Service is unavailable in all regions. Please try again later.");
-          }
-        }
-      }
+      // Use cross-region inference - AWS Bedrock will handle routing automatically
+      const resultText = await callBedrockAPI(ingredientsArray);
+      setResult(resultText || "No recipe content returned");
+      
     } catch (e) {
-      console.error("Exception:", e);
+      console.error("Cross-region inference failed:", e);
       if (e instanceof Error) {
-        setError(`An error occurred: ${e.message}`);
+        setError(`Service error: ${e.message}`);
       } else {
-        setError("An unknown error occurred. Please try again.");
+        setError("Service is currently unavailable. Please try again later.");
       }
     } finally {
       setLoading(false);
@@ -169,7 +161,7 @@ function App() {
         <div className={`result-container ${result || loading || error ? 'appear' : ''}`}>
           {loading ? (
             <div className="loader-container">
-              <p>Creating your personalized recipe...</p>
+              <p>Creating your personalized recipe using cross-region inference...</p>
               <Loader size="large" />
               <Placeholder size="large" />
               <Placeholder size="large" />
@@ -178,19 +170,10 @@ function App() {
           ) : error ? (
             <p className="result error-message">{error}</p>
           ) : (
-            <>
-              {usingFallback && (
-                <p className="fallback-notice">Using fallback region (ap-northeast-1)</p>
-              )}
-              <p className="result">{result}</p>
-            </>
+            <p className="result">{result}</p>
           )}
         </div>
       )}
-      
-      <footer className="footer">
-        © {new Date().getFullYear()} Aiden Dinh & Arthur Nguyen
-      </footer>
     </div>
   );
 }
