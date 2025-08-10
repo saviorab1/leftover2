@@ -8,6 +8,7 @@ import { generateClient } from "aws-amplify/data";
 import outputs from "../amplify_outputs.json";
 import logoImage from "./assets/pics/logo.png";
 import { signOut } from "aws-amplify/auth";
+import { getCurrentUser } from 'aws-amplify/auth';
 
 import "@aws-amplify/ui-react/styles.css";
 
@@ -67,6 +68,32 @@ function App() {
     }
   };
 
+  const collectUserData = async (ingredients: string) => {
+    try {
+      const user = await getCurrentUser();
+      const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      const dataPayload = {
+        ingredients,
+        timestamp: new Date().toISOString(),
+        userId: user.userId || 'anonymous',
+        sessionId
+      };
+  
+      // Replace YOUR_API_GATEWAY_URL with the actual URL from step 15.3
+      await fetch('https://d03syfw3fh.execute-api.ap-southeast-1.amazonaws.com/prod/collect-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataPayload)
+      });
+    } catch (error) {
+      // Silently fail - don't disrupt user experience
+      console.log('Data collection failed:', error);
+    }
+  };
+
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!inputValue.trim()) return;
@@ -77,6 +104,10 @@ function App() {
 
     try {
       const ingredientsInput = inputValue.trim();
+
+      // Collect user data (fire and forget)
+      collectUserData(ingredientsInput);
+
       const ingredientsArray = ingredientsInput
         .split(",")
         .map(ingredient => ingredient.trim())
@@ -161,7 +192,7 @@ function App() {
         <div className={`result-container ${result || loading || error ? 'appear' : ''}`}>
           {loading ? (
             <div className="loader-container">
-              <p>Creating your personalized recipe using cross-region inference...</p>
+              <p>Creating your personalized recipe...</p>
               <Loader size="large" />
               <Placeholder size="large" />
               <Placeholder size="large" />
