@@ -4,8 +4,8 @@ export function request(ctx) {
   // Construct the prompt with the provided ingredients
   const prompt = `Suggest a recipe idea using these ingredients (Please provide a recipe with the language used in the input ingredients. Provide 2 to 3 different recipes if possible): ${ingredients.join(", ")}.`;
 
-  // Use cross-region inference profile for automatic region routing
-  const modelId = "apac.anthropic.claude-sonnet-4-20250514-v1:0";
+  // Use global cross-region inference profile for automatic region routing
+  const modelId = "global.anthropic.claude-haiku-4-5-20251001-v1:0";
 
   // Return the request configuration
   return {

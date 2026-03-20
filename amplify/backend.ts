@@ -8,9 +8,9 @@ const backend = defineBackend({
   data,
 });
 
-// Use the latest Claude 4.0 model with cross-region inference
-const crossRegionModelId = "apac.anthropic.claude-sonnet-4-20250514-v1:0"; //Declare the inference profile ID here
-const regionalModelId = "anthropic.claude-sonnet-4-20250514-v1:0"; //Declare the Bedrock modelID here
+// Use Claude Haiku 4.5 with global cross-region inference
+const crossRegionModelId = "global.anthropic.claude-haiku-4-5-20251001-v1:0"; //Declare the inference profile ID here
+const regionalModelId = "anthropic.claude-haiku-4-5-20251001-v1:0"; //Declare the Bedrock modelID here
 
 // Primary region  - Cross-region inference will handle routing automatically
 const bedrockDataSource = backend.data.resources.graphqlApi.addHttpDataSource(
